@@ -33,18 +33,33 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <li><a asp-area="" asp-controller="Account" asp-action="SignIn">Sign In...</a></li>
+                    }
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="navbar-text">Hello, @User.Identity.Name !</li>
+                        <li><a asp-area="" asp-controller="Account" asp-action="SignOut">Sign Out</a></li>
+                    }
                 </ul>
             </div>
         </div>
     </nav>
+
     <div class="container body-content">
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2018 - BankIdDotNet2Demo</p>
+            <p>Tester BankID OpenID Connect Server: <a href='@Startup.manifestUrl'>@Startup.manifestUrl</a></p>
+            <p>Ønskede scope: @Startup.scope</p>
+            @if (User?.Identity?.IsAuthenticated ?? false == true)
+            {
+                <p>Godkjente scope: @ViewBag.allowed_scopes</p>
+            }
+            <p>Artikkel om ASP.NET Core 2.0 Authentication: <a href="https://digitalmccullough.com/posts/aspnetcore-auth-system-demystified.html">Følg lenken</a></p>
         </footer>
     </div>
-
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
