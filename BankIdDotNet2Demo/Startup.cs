@@ -49,20 +49,12 @@ namespace BankIdDotNet2Demo
                 options.LoginPath = new PathString("/Account/SignIn");
                 options.LogoutPath = new PathString("/Account/SignOut");
             })
-            //.AddCookie("ClientCookie", options =>
-            //{
-            //    options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + "ClientCookie";
-            //    options.AccessDeniedPath = new PathString("/Account/AccessDenied");
-            //    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-            //    options.LoginPath = new PathString("/account/signin");
-            //    options.LogoutPath = new PathString("/account/signout");
-            //})
             .AddOpenIdConnect(o =>
             {
                 o.Authority = Startup.authority;
                 o.ClientId = Properties.Resources.ClientId;
                 o.ClientSecret = Properties.Resources.ClientSecret;
-                o.ResponseType = "code";
+                o.ResponseType = OpenIdConnectResponseType.Code; // Use the authorization code flow.
                 o.RequireHttpsMetadata = false;
                 o.SaveTokens = true;
                 o.TokenValidationParameters.NameClaimType = "name";
@@ -70,7 +62,7 @@ namespace BankIdDotNet2Demo
                 o.TokenValidationParameters.RequireSignedTokens = true;
                 o.TokenValidationParameters.SaveSigninToken = true;
                 o.GetClaimsFromUserInfoEndpoint = Boolean.Parse(Properties.Resources.CallUserInfo?.ToLower());
-                o.Events = new Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectEvents()
+                o.Events = new OpenIdConnectEvents()
                 {
                     OnRedirectToIdentityProvider = context =>
                     {
@@ -78,20 +70,25 @@ namespace BankIdDotNet2Demo
                         {
                             case OpenIdConnectRequestType.Authentication:
 
-                                // Check RedirectUri
                                 context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.Scope, Startup.scope);
 
                                 if (context.Properties.Items.ContainsKey("login_hint"))
                                 {
-                                    string lh = context.Properties.Items["login_hint"];
-                                    context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.LoginHint, lh);
+                                    string lh = context.Properties.Items["login_hint"].Trim();
+                                    if (lh.Length > 1)
+                                    {
+                                        context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.LoginHint, lh);
+                                    }
                                 }
+
                                 if (context.Properties.Items.ContainsKey("ui_locales"))
                                 {
-                                    context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.UiLocales, context.Properties.Items["ui_locales"]);
+                                    string uil = context.Properties.Items["ui_locales"].Trim();
+                                    if (uil.Length > 1)
+                                    {
+                                        context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.UiLocales, uil);
+                                    }
                                 }
-                                //context.ProtocolMessage.RemoveParameter("x-client-SKU");
-                                //context.ProtocolMessage.RemoveParameter("x-client-ver");
                                 break;
                             case OpenIdConnectRequestType.Token:
                                 break;
@@ -106,36 +103,34 @@ namespace BankIdDotNet2Demo
                     {
                         var temp = context.TokenEndpointRequest;
 
-
                         return Task.FromResult(0);
                     },
-                    OnAuthenticationFailed = c =>
+                    OnAuthenticationFailed = context =>
                     {
-                        c.HandleResponse();
+                        context.HandleResponse();
 
-                        c.Response.StatusCode = 500;
-                        c.Response.ContentType = "text/plain";
+                        context.Response.StatusCode = 500;
+                        context.Response.ContentType = "text/plain";
                         if (this.env != null && env.IsDevelopment())
                         {
                             // Debug only, in production do not share exceptions with the remote host.
-                            return c.Response.WriteAsync(c.Exception.ToString());
+                            return context.Response.WriteAsync(context.Exception.ToString());
                         }
-                        return c.Response.WriteAsync("An error occurred processing your authentication.");
+                        return context.Response.WriteAsync("An error occurred processing your authentication.");
+                    },
+                    OnUserInformationReceived = context =>
+                    {
+                        var temp = context.User;
+
+                        return Task.FromResult(0);
+                    },
+                    OnTokenResponseReceived = context =>
+                    {
+                        var temp = context.TokenEndpointResponse;
+
+                        return Task.FromResult(0);
                     }
                 };
-
-                // Map the inbound BankID claim "name" to something understood by ClaimsIdentity.
-                // Disabled: Try setting TokenValidationParameters.NameClaimType = "name" instead.
-                //var defaultClaimMap = new Dictionary<string, string>
-                //{
-                //    { "name", ClaimsIdentity.DefaultNameClaimType }
-                //};
-
-                //o.SecurityTokenValidator = new JwtSecurityTokenHandler()
-                //{
-                //    InboundClaimTypeMap = defaultClaimMap
-                //};
-
             });
 
             services.AddMvc();
@@ -146,7 +141,7 @@ namespace BankIdDotNet2Demo
             services.AddSession(options =>
             {
                 // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.IdleTimeout = TimeSpan.FromSeconds(60);
                 options.Cookie.HttpOnly = true;
             });
 

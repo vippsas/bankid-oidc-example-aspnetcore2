@@ -79,14 +79,14 @@ namespace BankIdDotNet2Demo.Controllers
         [HttpGet]
         public ActionResult SetLoginHint(string login_hint)
         {
-            HttpContext.Session.SetString("login_hint", login_hint);
+            HttpContext.Session.SetString("login_hint", login_hint ?? " ");
             return RedirectToAction("Index", "Home");
         }
         [AllowAnonymous]
         [HttpGet]
         public ActionResult SetUiLocales(string ui_locales)
         {
-            HttpContext.Session.SetString("ui_locales", ui_locales);
+            HttpContext.Session.SetString("ui_locales", ui_locales ?? " ");
             return RedirectToAction("Index", "Home");
         }
         [AllowAnonymous]
