@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BankIdDotNet2Demo.Properties {
+namespace BankIdAspNetCore2Demo.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace BankIdDotNet2Demo.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BankIdDotNet2Demo.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BankIdAspNetCore2Demo.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,7 @@ namespace BankIdDotNet2Demo.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to false.
+        ///   Looks up a localized string similar to true.
         /// </summary>
         internal static string CallUserInfo {
             get {
@@ -70,7 +70,7 @@ namespace BankIdDotNet2Demo.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BankIdDotNetDemo.
+        ///   Looks up a localized string similar to testclientDotNetCore2.
         /// </summary>
         internal static string ClientId {
             get {
@@ -79,7 +79,7 @@ namespace BankIdDotNet2Demo.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1cc73b10-5915-459b-aa64-9236561bf4f8.
+        ///   Looks up a localized string similar to .
         /// </summary>
         internal static string ClientSecret {
             get {
@@ -88,7 +88,7 @@ namespace BankIdDotNet2Demo.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to http://localhost:8080/auth/realms/test.
+        ///   Looks up a localized string similar to https://oidc-preprod.bankidapis.no/auth/realms/preprod.
         /// </summary>
         internal static string OIDC_BaseUrl {
             get {
@@ -97,11 +97,29 @@ namespace BankIdDotNet2Demo.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to openid profile nnin_altsub.
+        ///   Looks up a localized string similar to openid profile nnin_altsub address email phone.
         /// </summary>
         internal static string Scope {
             get {
                 return ResourceManager.GetString("Scope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://oidc-preprod.bankidapis.no/auth/realms/preprod/.well-known/openid-configuration.
+        /// </summary>
+        internal static string String2 {
+            get {
+                return ResourceManager.GetString("String2", resourceCulture);
             }
         }
     }

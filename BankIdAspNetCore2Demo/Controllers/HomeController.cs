@@ -1,21 +1,25 @@
-﻿using BankIdDotNet2Demo.Models;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using System.IdentityModel.Tokens.Jwt;
 
-namespace BankIdDotNet2Demo.Controllers
+namespace BankIdAspNetCore2Demo.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        public async System.Threading.Tasks.Task<IActionResult> Index()
         {
             if (User.Identity.IsAuthenticated)
             {
-                ViewBag.Title1 = "User.Claims:";
+                ViewBag.Title1 = "(Microsoft.AspNetCore.Mvc.ClaimsPrincipal) User.Claims:";
                 ViewBag.Title2 = string.Empty;
                 ViewBag.Message = string.Empty;
+                // If you need the access_token: string accessToken = await HttpContext.GetTokenAsync("access_token");
+                string idToken = await HttpContext.GetTokenAsync("id_token");
+                // Prepare for display.
+                ViewBag.id_token = new JwtSecurityToken(idToken).ToString();
             }
             else
             {
@@ -23,7 +27,7 @@ namespace BankIdDotNet2Demo.Controllers
 
                 if (string.IsNullOrEmpty(value))
                 {
-                    HttpContext.Session.SetString("login_hint", "BID:07025302553");
+                    HttpContext.Session.SetString("login_hint", " ");
                 }
 
                 value = HttpContext.Session.GetString("ui_locales");
@@ -39,7 +43,8 @@ namespace BankIdDotNet2Demo.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "A demonstration on how to user BankID's OpenID Connect server\n Programmed by Jens Erik Torgersen, Kantega AS.";
+            ViewData["Message"] = "A demonstration on how to use BankID's OpenID Connect server";
+            ViewData["Message2"] = "Programmed by Jens Erik Torgersen, Kantega AS.";
 
             return View();
         }
@@ -49,30 +54,6 @@ namespace BankIdDotNet2Demo.Controllers
             ViewData["Message"] = "https://confluence.bankidnorge.no/confluence/display/DEVPUB/BankID+Norway+Developer+Portal";
 
             return View();
-        }
-
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        private byte[] getByteArray(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return null;
-
-            var enc = new UTF8Encoding();
-            return enc.GetBytes(s.ToCharArray());
-        }
-
-        private string getString(byte[] b)
-        {
-            if (b == null || b.Length == 0)
-                return string.Empty;
-
-
-            var enc = new UTF8Encoding();
-            return enc.GetString(b);
         }
 
         [AllowAnonymous]
@@ -89,13 +70,7 @@ namespace BankIdDotNet2Demo.Controllers
             HttpContext.Session.SetString("ui_locales", ui_locales ?? " ");
             return RedirectToAction("Index", "Home");
         }
-        [AllowAnonymous]
-        [HttpGet]
-        public ActionResult SetJWS(string check_jws = "false")
-        {
-            // Startup.useRequestParam = string.IsNullOrEmpty(check_jws) ? false : bool.Parse(check_jws);
-            return RedirectToAction("Index", "Home");
-        }
+
         [AllowAnonymous]
         public ActionResult Error(string message)
         {

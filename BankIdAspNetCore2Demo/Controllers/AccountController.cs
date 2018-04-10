@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BankIdDotNet2Demo.Controllers
+namespace BankIdAspNetCore2Demo.Controllers
 {
     public class AccountController : Controller
     {
@@ -34,27 +34,17 @@ namespace BankIdDotNet2Demo.Controllers
         //
         // GET: /Account/SignOut
         [HttpGet]
-        public IActionResult SignOut()
+        public async System.Threading.Tasks.Task<IActionResult> SignOut()
         {
-            var callbackUrl = Url.Action(nameof(SignedOut), "Account", values: null, protocol: Request.Scheme);
-            return SignOut(
-                new AuthenticationProperties { RedirectUri = callbackUrl },
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                OpenIdConnectDefaults.AuthenticationScheme);
+            await AuthenticationHttpContextExtensions.SignOutAsync(HttpContext);
+
+            return RedirectToAction("Index", "Home");
         }
 
-        //
-
-        // GET: /Account/SignedOut
-        [HttpGet]
-        public IActionResult SignedOut()
-        {
-            // Redirect to home page which switches views depening on user authentication.
-            return RedirectToAction(nameof(HomeController.Index), "Home");
-        }
 
         //
         // GET: /Account/AccessDenied
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult AccessDenied()
         {

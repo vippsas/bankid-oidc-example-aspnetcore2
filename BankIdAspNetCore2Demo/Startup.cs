@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,23 +7,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace BankIdDotNet2Demo
+namespace BankIdAspNetCore2Demo
 {
+    // Nice article which explains security configuration in .NET Core 2.0: https://github.com/aspnet/Security/issues/1310
     public class Startup
     {
         public static string authority = Properties.Resources.OIDC_BaseUrl;
         public static string manifestUrl = authority + "/.well-known/openid-configuration";
         public static string scope = Properties.Resources.Scope;
-        public static CultureInfo culture = CultureInfo.CurrentCulture;
 
         IHostingEnvironment env = null;
 
@@ -51,17 +46,40 @@ namespace BankIdDotNet2Demo
             })
             .AddOpenIdConnect(o =>
             {
-                o.Authority = Startup.authority;
+                // OpenID Connect Client/Server Identification:
+                o.Authority = Properties.Resources.OIDC_BaseUrl;
                 o.ClientId = Properties.Resources.ClientId;
                 o.ClientSecret = Properties.Resources.ClientSecret;
-                o.ResponseType = OpenIdConnectResponseType.Code; // Use the authorization code flow.
-                o.RequireHttpsMetadata = false;
+
+                o.ResponseType = OpenIdConnectResponseType.Code; // As expected by OpenID framework on ASPNET Core 2.0.
+                o.RequireHttpsMetadata = true;
                 o.SaveTokens = true;
                 o.TokenValidationParameters.NameClaimType = "name";
                 o.TokenValidationParameters.AuthenticationType = "amr";
                 o.TokenValidationParameters.RequireSignedTokens = true;
                 o.TokenValidationParameters.SaveSigninToken = true;
                 o.GetClaimsFromUserInfoEndpoint = Boolean.Parse(Properties.Resources.CallUserInfo?.ToLower());
+
+                // BankID Tillegsinfo hentes med userinfo. Noen må spesifikt tas vare på - ikke alle claims blir det
+                // per default for å spare plass:
+                o.ClaimActions.MapJsonKey("phone_number", "phone_number");
+                o.ClaimActions.MapCustomJson("address", jobj =>
+                {
+                    var values = jobj.GetEnumerator();
+                    string result = string.Empty;
+
+                    while (values.MoveNext())
+                    {
+                        var item = values.Current;
+                        if ("address".Equals(item.Key))
+                        {
+                            // Formatert adresse blir tatt vare på (ligger først i strukturen)
+                            result = item.Value.First.First.ToString();
+                        }
+                    }
+                    return result;
+                });
+
                 o.Events = new OpenIdConnectEvents()
                 {
                     OnRedirectToIdentityProvider = context =>
@@ -72,6 +90,15 @@ namespace BankIdDotNet2Demo
 
                                 context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.Scope, Startup.scope);
 
+                                if (context.Properties.Items.ContainsKey("ui_locales"))
+                                {
+                                    string lh = context.Properties.Items["ui_locales"].Trim();
+                                    if (lh.Length > 1)
+                                    {
+                                        context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.UiLocales, lh);
+                                    }
+                                }
+
                                 if (context.Properties.Items.ContainsKey("login_hint"))
                                 {
                                     string lh = context.Properties.Items["login_hint"].Trim();
@@ -80,20 +107,14 @@ namespace BankIdDotNet2Demo
                                         context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.LoginHint, lh);
                                     }
                                 }
-
-                                if (context.Properties.Items.ContainsKey("ui_locales"))
-                                {
-                                    string uil = context.Properties.Items["ui_locales"].Trim();
-                                    if (uil.Length > 1)
-                                    {
-                                        context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.UiLocales, uil);
-                                    }
-                                }
                                 break;
+
                             case OpenIdConnectRequestType.Token:
                                 break;
+
                             case OpenIdConnectRequestType.Logout:
                                 break;
+
                             default:
                                 break;
                         }
@@ -101,8 +122,7 @@ namespace BankIdDotNet2Demo
                     },
                     OnAuthorizationCodeReceived = context =>
                     {
-                        var temp = context.TokenEndpointRequest;
-
+                        // Possible Token endpoint request customisation: var temp = context.TokenEndpointRequest;
                         return Task.FromResult(0);
                     },
                     OnAuthenticationFailed = context =>
@@ -120,14 +140,12 @@ namespace BankIdDotNet2Demo
                     },
                     OnUserInformationReceived = context =>
                     {
-                        var temp = context.User;
-
+                        // Check on return from userinfo - UserInformationReceivedContext context
                         return Task.FromResult(0);
                     },
                     OnTokenResponseReceived = context =>
                     {
-                        var temp = context.TokenEndpointResponse;
-
+                        // Possibility to check token response: var temp = context.TokenEndpointResponse;
                         return Task.FromResult(0);
                     }
                 };
@@ -137,10 +155,9 @@ namespace BankIdDotNet2Demo
 
             // Add cookie sessions for passing parameters from controller to event handlers
             // Adds a default in-memory implementation of IDistributedCache.
-            services.AddDistributedMemoryCache();
+            //services.AddMemoryCache();
             services.AddSession(options =>
             {
-                // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromSeconds(60);
                 options.Cookie.HttpOnly = true;
             });

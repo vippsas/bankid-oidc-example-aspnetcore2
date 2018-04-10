@@ -118,18 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CallUserInfo" xml:space="preserve">
-    <value>false</value>
+    <value>true</value>
   </data>
   <data name="ClientId" xml:space="preserve">
-    <value>BankIdDotNetDemo</value>
+    <value>testclientDotNetCore2</value>
+    <comment>Preprod</comment>
   </data>
   <data name="ClientSecret" xml:space="preserve">
-    <value>1cc73b10-5915-459b-aa64-9236561bf4f8</value>
+    <value />
+    <comment>Preprod</comment>
   </data>
   <data name="OIDC_BaseUrl" xml:space="preserve">
-    <value>http://localhost:8080/auth/realms/test</value>
+    <value>https://oidc-preprod.bankidapis.no/auth/realms/preprod</value>
   </data>
   <data name="Scope" xml:space="preserve">
-    <value>openid profile nnin_altsub</value>
+    <value>openid profile nnin_altsub address email phone</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
+    <comment>Preprod</comment>
+  </data>
+  <data name="String2" xml:space="preserve">
+    <value>https://oidc-preprod.bankidapis.no/auth/realms/preprod/.well-known/openid-configuration</value>
+    <comment>Discovery</comment>
   </data>
 </root>
