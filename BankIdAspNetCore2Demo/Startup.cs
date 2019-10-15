@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -19,11 +21,16 @@ namespace BankIdAspNetCore2Demo
         public static string manifestUrl = authority + "/.well-known/openid-configuration";
         public static string scope = Properties.Resources.Scope;
 
+        // readonly string CORSAllowSpecificOrigins = "_corsAllowBankIDOIDCOrigins";
+
+        private readonly ILogger _logger;
+
         IHostingEnvironment env = null;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
+            _logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -88,7 +95,9 @@ namespace BankIdAspNetCore2Demo
                         {
                             case OpenIdConnectRequestType.Authentication:
 
+                                // context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.ResponseMode, "query");
                                 context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.Scope, Startup.scope);
+                                context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.State, "foo");
 
                                 if (context.Properties.Items.ContainsKey("ui_locales"))
                                 {
@@ -107,6 +116,7 @@ namespace BankIdAspNetCore2Demo
                                         context.ProtocolMessage.SetParameter(OpenIdConnectParameterNames.LoginHint, lh);
                                     }
                                 }
+                                _logger.LogInformation($"OnRedirectToIdentityProvider: {context.ProtocolMessage.State}");
                                 break;
 
                             case OpenIdConnectRequestType.Token:
@@ -122,6 +132,7 @@ namespace BankIdAspNetCore2Demo
                     },
                     OnAuthorizationCodeReceived = context =>
                     {
+                        _logger.LogInformation($"OnAuthorizationCodeReceived: {context.ProtocolMessage.State}");
                         // Possible Token endpoint request customisation: var temp = context.TokenEndpointRequest;
                         return Task.FromResult(0);
                     },
@@ -151,6 +162,22 @@ namespace BankIdAspNetCore2Demo
                 };
             });
 
+            // services.AddCors(options =>
+            // {
+            //     options.AddPolicy(CORSAllowSpecificOrigins,
+            //     builder =>
+            //     {
+            //         builder.WithOrigins("https://prototype3.bankidnorge.no",
+            //                             "https://prototype.bankidnorge.no",
+            //                             "https://oidc-preprod.bankidapis.no",
+            //                             "http://localhost:44326",
+            //                             "https://localhost:8888")
+            //                             .AllowAnyHeader()
+            //                             .AllowAnyMethod()
+            //                             .AllowCredentials();
+            //     });
+            // });
+
             services.AddMvc();
 
             // Add cookie sessions for passing parameters from controller to event handlers
@@ -162,7 +189,11 @@ namespace BankIdAspNetCore2Demo
                 options.Cookie.HttpOnly = true;
             });
 
-
+            // services.Configure<ForwardedHeadersOptions>(options =>
+            // {
+            //     options.ForwardedHeaders =
+            //         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            // });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -183,6 +214,8 @@ namespace BankIdAspNetCore2Demo
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseSession();
+
+            // app.UseCors(CORSAllowSpecificOrigins);
 
             app.UseMvc(routes =>
             {
