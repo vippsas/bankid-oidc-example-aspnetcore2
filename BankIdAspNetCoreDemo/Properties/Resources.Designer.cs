@@ -104,23 +104,5 @@ namespace BankIdAspNetCoreDemo.Properties {
                 return ResourceManager.GetString("Scope", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string String1 {
-            get {
-                return ResourceManager.GetString("String1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to https://oidc-preprod.bankidapis.no/auth/realms/preprod/.well-known/openid-configuration.
-        /// </summary>
-        internal static string String2 {
-            get {
-                return ResourceManager.GetString("String2", resourceCulture);
-            }
-        }
     }
 }

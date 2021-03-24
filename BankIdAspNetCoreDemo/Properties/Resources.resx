@@ -121,25 +121,17 @@
     <value>true</value>
   </data>
   <data name="ClientId" xml:space="preserve">
-    <value>testclientDotNetCore2</value>
-    <comment>Preprod</comment>
+    <value />
+    <comment>Use the client_id provided by BankID OIDC</comment>
   </data>
   <data name="ClientSecret" xml:space="preserve">
     <value />
-    <comment>Preprod</comment>
+    <comment>Use the client_secret provided by BankID OIDC</comment>
   </data>
   <data name="OIDC_BaseUrl" xml:space="preserve">
-    <value>https://oidc-preprod.bankidapis.no/auth/realms/preprod</value>
+    <value>https://oidc-current.bankidapis.no/auth/realms/current</value>
   </data>
   <data name="Scope" xml:space="preserve">
     <value>openid profile nnin_altsub address email phone</value>
-  </data>
-  <data name="String1" xml:space="preserve">
-    <value />
-    <comment>Preprod</comment>
-  </data>
-  <data name="String2" xml:space="preserve">
-    <value>https://oidc-preprod.bankidapis.no/auth/realms/preprod/.well-known/openid-configuration</value>
-    <comment>Discovery</comment>
   </data>
 </root>
