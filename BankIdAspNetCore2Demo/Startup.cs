@@ -6,20 +6,20 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System;
 using System.Threading.Tasks;
 
 namespace BankIdAspNetCore2Demo
 {
-    // Nice article which explains security configuration in .NET Core 2.0: https://github.com/aspnet/Security/issues/1310
     public class Startup
     {
         public static string authority = Properties.Resources.OIDC_BaseUrl;
         public static string manifestUrl = authority + "/.well-known/openid-configuration";
         public static string scope = Properties.Resources.Scope;
 
-        IHostingEnvironment env = null;
+        IWebHostEnvironment env = null;
 
         public Startup(IConfiguration configuration)
         {
@@ -63,21 +63,13 @@ namespace BankIdAspNetCore2Demo
                 // BankID Tillegsinfo hentes med userinfo. Noen må spesifikt tas vare på - ikke alle claims blir det
                 // per default for å spare plass:
                 o.ClaimActions.MapJsonKey("phone_number", "phone_number");
-                o.ClaimActions.MapCustomJson("address", jobj =>
-                {
-                    var values = jobj.GetEnumerator();
-                    string result = string.Empty;
-
-                    while (values.MoveNext())
-                    {
-                        var item = values.Current;
-                        if ("address".Equals(item.Key))
-                        {
-                            // Formatert adresse blir tatt vare på (ligger først i strukturen)
-                            result = item.Value.First.First.ToString();
+                o.ClaimActions.MapCustomJson("address", jsonElement => {
+                    if (jsonElement.TryGetProperty("address", out var addressElement)) {
+                        if (addressElement.TryGetProperty("formatted", out var formattedAddressElement)) {
+                            return formattedAddressElement.ToString();
                         }
                     }
-                    return result;
+                    return "";
                 });
 
                 o.Events = new OpenIdConnectEvents()
@@ -151,7 +143,7 @@ namespace BankIdAspNetCore2Demo
                 };
             });
 
-            services.AddMvc();
+            services.AddControllersWithViews();
 
             // Add cookie sessions for passing parameters from controller to event handlers
             // Adds a default in-memory implementation of IDistributedCache.
@@ -166,7 +158,7 @@ namespace BankIdAspNetCore2Demo
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             this.env = env;
 
@@ -181,14 +173,17 @@ namespace BankIdAspNetCore2Demo
             }
 
             app.UseStaticFiles();
+            app.UseRouting();
+
             app.UseAuthentication();
+
             app.UseSession();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}"
+                );
             });
         }
     }
