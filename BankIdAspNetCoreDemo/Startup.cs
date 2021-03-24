@@ -59,18 +59,7 @@ namespace BankIdAspNetCoreDemo
                 o.TokenValidationParameters.RequireSignedTokens = true;
                 o.TokenValidationParameters.SaveSigninToken = true;
                 o.GetClaimsFromUserInfoEndpoint = Boolean.Parse(Properties.Resources.CallUserInfo?.ToLower());
-
-                // BankID Tillegsinfo hentes med userinfo. Noen må spesifikt tas vare på - ikke alle claims blir det
-                // per default for å spare plass:
-                o.ClaimActions.MapJsonKey("phone_number", "phone_number");
-                o.ClaimActions.MapCustomJson("address", jsonElement => {
-                    if (jsonElement.TryGetProperty("address", out var addressElement)) {
-                        if (addressElement.TryGetProperty("formatted", out var formattedAddressElement)) {
-                            return formattedAddressElement.ToString();
-                        }
-                    }
-                    return "";
-                });
+                o.ClaimActions.MapJsonKey("nnin", "nnin");
 
                 o.Events = new OpenIdConnectEvents()
                 {

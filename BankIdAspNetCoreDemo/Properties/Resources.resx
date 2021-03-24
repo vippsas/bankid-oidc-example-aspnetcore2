@@ -132,6 +132,6 @@
     <value>https://oidc-current.bankidapis.no/auth/realms/current</value>
   </data>
   <data name="Scope" xml:space="preserve">
-    <value>openid profile nnin_altsub address email phone</value>
+    <value>openid profile nnin</value>
   </data>
 </root>
