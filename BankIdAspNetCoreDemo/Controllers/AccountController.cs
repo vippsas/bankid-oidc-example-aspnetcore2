@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BankIdAspNetCore2Demo.Controllers
+namespace BankIdAspNetCoreDemo.Controllers
 {
     public class AccountController : Controller
     {

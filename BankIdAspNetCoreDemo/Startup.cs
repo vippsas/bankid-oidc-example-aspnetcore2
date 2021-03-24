@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System;
 using System.Threading.Tasks;
 
-namespace BankIdAspNetCore2Demo
+namespace BankIdAspNetCoreDemo
 {
     public class Startup
     {

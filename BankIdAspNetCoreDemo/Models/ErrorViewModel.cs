@@ -1,6 +1,6 @@
 using System;
 
-namespace BankIdAspNetCore2Demo.Models
+namespace BankIdAspNetCoreDemo.Models
 {
     public class ErrorViewModel
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace BankIdAspNetCore2Demo
+namespace BankIdAspNetCoreDemo
 {
     public class Program
     {

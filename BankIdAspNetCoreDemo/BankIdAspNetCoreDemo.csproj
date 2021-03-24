@@ -5,7 +5,7 @@
     <Description>Demonstration of useing BankID Norway's OpenID Connect for various authentications</Description>
     <Authors>Jens Erik Torgersen, Kantega AS</Authors>
     <Company>BankID Norge AS</Company>
-    <StartupObject>BankIdAspNetCore2Demo.Program</StartupObject>
+    <StartupObject>BankIdAspNetCoreDemo.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
