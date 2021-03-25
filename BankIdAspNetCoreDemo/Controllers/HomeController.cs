@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace BankIdAspNetCore2Demo.Controllers
+namespace BankIdAspNetCoreDemo.Controllers
 {
     public class HomeController : Controller
     {

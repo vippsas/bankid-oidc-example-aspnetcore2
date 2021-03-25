@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BankIdAspNetCore2Demo.Properties {
+namespace BankIdAspNetCoreDemo.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace BankIdAspNetCore2Demo.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BankIdAspNetCore2Demo.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BankIdAspNetCoreDemo.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -102,24 +102,6 @@ namespace BankIdAspNetCore2Demo.Properties {
         internal static string Scope {
             get {
                 return ResourceManager.GetString("Scope", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string String1 {
-            get {
-                return ResourceManager.GetString("String1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to https://oidc-preprod.bankidapis.no/auth/realms/preprod/.well-known/openid-configuration.
-        /// </summary>
-        internal static string String2 {
-            get {
-                return ResourceManager.GetString("String2", resourceCulture);
             }
         }
     }

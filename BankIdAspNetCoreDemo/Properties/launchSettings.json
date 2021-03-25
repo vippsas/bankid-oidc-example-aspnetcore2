@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://localhost/BankIdAspNetCore2Demo",
+      "applicationUrl": "http://localhost/BankIdAspNetCoreDemo",
       "sslPort": 0
     },
     "iisExpress": {
@@ -19,13 +19,13 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "BankIdAspNetCore2Demo": {
+    "BankIdAspNetCoreDemo": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:44326/"
+      "applicationUrl": "https://localhost:44323/"
     }
   }
 }
